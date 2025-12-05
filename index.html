@@ -34,7 +34,7 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* === 靈氣背景 (保留妳喜歡的版本) === */
+        /* === 靈氣背景 === */
         .aura-background {
             position: fixed;
             top: 0;
@@ -194,31 +194,34 @@
             transform: rotateY(180deg);
             padding: 20px;
             flex-direction: column;
-            justify-content: flex-start; /* 改為靠上對齊 */
+            justify-content: flex-start; 
+            /* 卡面本身有淡淡的漸層，透明圖片會透出這個顏色 */
             background-image: linear-gradient(to bottom, #fffbf5 0%, #fff0f5 100%);
         }
 
-        /* 圖片容器 */
+        /* === 修正重點：圖片容器 === */
         .img-container {
             width: 100%;
-            height: 180px; /* 固定高度，確保版面整齊 */
+            height: 180px; 
             margin-bottom: 15px;
             margin-top: 10px;
-            border-radius: 8px;
-            overflow: hidden;
-            background-color: #f0f0f0;
+            border-radius: 0; /* 移除圓角 */
+            overflow: visible; /* 允許陰影溢出 */
+            background-color: transparent; /* 設為透明！ */
             display: flex;
             justify-content: center;
             align-items: center;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: none; /* 移除方框陰影 */
         }
 
         .card-img {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* 讓圖片填滿且不變形 */
+            object-fit: contain; /* 改為 contain：確保圖片不被裁切 */
             display: block;
-            opacity: 0; /* 動畫用 */
+            opacity: 0; 
+            /* 如果圖片本身是黑色的，這個陰影會讓它有點浮起來的感覺 */
+            filter: drop-shadow(0 5px 8px rgba(0,0,0,0.1));
         }
 
         .quote-text {
@@ -229,7 +232,7 @@
             font-weight: 600;
             opacity: 0;
             transform: translateY(10px);
-            margin-bottom: auto; /* 讓字置中 */
+            margin-bottom: auto; 
             margin-top: auto;
             padding: 0 5px;
         }
@@ -244,7 +247,7 @@
             opacity: 0;
         }
 
-        /* === 粒子特效 (保留) === */
+        /* === 粒子特效 === */
         .particles {
             position: absolute;
             top: 50%;
@@ -343,8 +346,8 @@
                 <div class="card-face card-front">
                     <!-- 圖片區 -->
                     <div class="img-container">
-                        <!-- 預設先放一張 placeholder，之後會被 JS 替換 -->
-                        <img src="https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" id="card-img" class="card-img" alt="Illustration">
+                        <!-- 請記得確認這裡的 id 必須是 card-img -->
+                        <img src="" id="card-img" class="card-img" alt="Illustration">
                     </div>
                     <div class="quote-text" id="quote-display"></div>
                     <div class="quote-num" id="quote-number">NO.001</div>
@@ -384,14 +387,11 @@
         ];
 
         /* 
-           2. 圖片資料庫 (請在此放入你的圖片檔名)
-           使用教學：
-           1. 在 GitHub 上傳圖片到一個叫 images 的資料夾 (或直接放在根目錄)。
-           2. 把檔名填入下方。
+           2. 圖片資料庫
+           請在這裡填入妳上傳到 GitHub 的透明 PNG 檔名
         */
         const images = [
-            // 這裡我先放幾張網路上的範例圖，讓你測試效果
-            // 等你自己上傳後，改成 "images/1.jpg", "images/2.jpg" 這樣即可
+            // 範例：請改成妳實際的檔名，例如 "images/heart.png"
             "images/1.png",
             "images/2.png",
             "images/3.png",
@@ -444,8 +444,14 @@
             quoteNum.textContent = `NO.${(qIndex + 1).toString().padStart(3, '0')}`;
 
             // 2. 隨機選圖片
-            const imgIndex = Math.floor(Math.random() * images.length);
-            cardImg.src = images[imgIndex];
+            // 如果 images 陣列是空的，或者發生錯誤，這裡加了一個保護機制
+            if (images.length > 0) {
+                const imgIndex = Math.floor(Math.random() * images.length);
+                cardImg.src = images[imgIndex];
+                cardImg.style.display = 'block';
+            } else {
+                cardImg.style.display = 'none'; // 沒圖片就隱藏
+            }
 
             // 3. 翻牌
             card.classList.add('is-flipped');
