@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Soul Message</title>
+    
+    <!-- APP 設定 -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#E0C3FC">
+    <link rel="apple-touch-icon" href="https://img.icons8.com/dusk/64/000000/moon-symbol.png">
+
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Zen+Maru+Gothic:wght@400&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --text-color: #4A403A;
+            --card-bg: #fffbf5;
+            --gold: #d4af37;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Cormorant Garamond', serif;
+            color: var(--text-color);
+            overflow: hidden;
+            background-color: #E0C3FC;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* === 靈氣背景 (保留妳喜歡的版本) === */
+        .aura-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: 
+                radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+                radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
+                radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
+            background-size: 200% 200%;
+            animation: auraFlow 15s ease infinite;
+        }
+        
+        .aura-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: 
+                radial-gradient(circle at 50% 50%, rgba(255, 228, 225, 0.4), transparent 60%),
+                radial-gradient(circle at 80% 20%, rgba(255, 218, 185, 0.4), transparent 50%);
+            filter: blur(30px);
+            animation: pulse 8s ease-in-out infinite alternate;
+        }
+
+        .noise-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 999;
+            opacity: 0.07;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E");
+        }
+
+        @keyframes auraFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.5; transform: scale(1); }
+            100% { opacity: 0.8; transform: scale(1.1); }
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            margin-bottom: 20px;
+            animation: fadeIn 2s ease forwards;
+        }
+
+        h1 {
+            font-size: 2rem;
+            color: #fff;
+            text-shadow: 0 0 15px rgba(255,255,255,0.6);
+            margin: 0;
+            letter-spacing: 4px;
+            font-weight: 400;
+            font-style: italic;
+        }
+
+        .subtitle {
+            font-family: 'Zen Maru Gothic', sans-serif;
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.8);
+            margin-top: 5px;
+            letter-spacing: 2px;
+        }
+
+        /* === 卡片本體 === */
+        .card-scene {
+            perspective: 1500px;
+            width: 280px;
+            height: 480px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .card {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+            transform-style: preserve-3d;
+            border-radius: 15px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+        }
+
+        .card.is-flipped {
+            transform: rotateY(180deg);
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.6), 0 20px 50px rgba(0,0,0,0.2);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-sizing: border-box;
+            background-color: var(--card-bg);
+            border: 8px solid white;
+            overflow: hidden;
+        }
+
+        /* 卡背 */
+        .card-back {
+            background-color: #151515;
+            color: var(--gold);
+            flex-direction: column;
+            border: 6px solid #f0f0f0;
+            background-image: 
+                radial-gradient(circle at 50% 50%, #2a2a2a 1px, transparent 1px),
+                linear-gradient(45deg, rgba(212,175,55,0.05) 25%, transparent 25%, transparent 75%, rgba(212,175,55,0.05) 75%, rgba(212,175,55,0.05));
+            background-size: 20px 20px, 40px 40px;
+        }
+
+        .moon-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.6));
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .card-title {
+            font-size: 1rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            border-top: 1px solid rgba(212, 175, 55, 0.5);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.5);
+            padding: 8px 15px;
+        }
+
+        /* 卡面 (放入圖片的位置) */
+        .card-front {
+            transform: rotateY(180deg);
+            padding: 20px;
+            flex-direction: column;
+            justify-content: flex-start; /* 改為靠上對齊 */
+            background-image: linear-gradient(to bottom, #fffbf5 0%, #fff0f5 100%);
+        }
+
+        /* 圖片容器 */
+        .img-container {
+            width: 100%;
+            height: 180px; /* 固定高度，確保版面整齊 */
+            margin-bottom: 15px;
+            margin-top: 10px;
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .card-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* 讓圖片填滿且不變形 */
+            display: block;
+            opacity: 0; /* 動畫用 */
+        }
+
+        .quote-text {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #2c2c2c;
+            text-align: center;
+            font-weight: 600;
+            opacity: 0;
+            transform: translateY(10px);
+            margin-bottom: auto; /* 讓字置中 */
+            margin-top: auto;
+            padding: 0 5px;
+        }
+
+        .quote-num {
+            position: absolute;
+            bottom: 15px;
+            font-size: 0.7rem;
+            color: #aaa;
+            font-family: sans-serif;
+            letter-spacing: 2px;
+            opacity: 0;
+        }
+
+        /* === 粒子特效 (保留) === */
+        .particles {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 20;
+            transform: translate(-50%, -50%);
+        }
+
+        .particle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 6px;
+            height: 6px;
+            background: gold;
+            border-radius: 50%;
+            opacity: 0;
+            box-shadow: 0 0 10px gold;
+        }
+
+        /* === 按鈕 === */
+        .btn-refresh {
+            margin-top: 40px;
+            padding: 12px 30px;
+            border: 1px solid rgba(255,255,255,0.4);
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(5px);
+            color: white;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            letter-spacing: 2px;
+            transition: all 0.4s ease;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(10px);
+            font-family: 'Cormorant Garamond', serif;
+        }
+
+        .btn-refresh.show {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+        
+        .btn-refresh:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes fadeIn { to { opacity: 1; } }
+        @keyframes contentFadeIn { to { opacity: 1; transform: translateY(0); } }
+
+        .music-hint {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            color: rgba(255,255,255,0.5);
+            font-size: 0.8rem;
+            opacity: 0;
+            transition: opacity 1s;
+        }
+    </style>
+</head>
+<body>
+    <audio id="bgm" loop>
+        <source src="music.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="noise-overlay"></div>
+    <div class="aura-background"></div>
+    <div class="aura-overlay"></div>
+
+    <div class="container">
+        <header>
+            <h1>Soul Message</h1>
+            <div class="subtitle">Tap to receive your guidance</div>
+        </header>
+        
+        <div class="card-scene" onclick="flipCard()">
+            <div class="card" id="card">
+                <!-- 背面 -->
+                <div class="card-face card-back">
+                    <div class="moon-icon">☾</div>
+                    <div class="card-title">Tap to Reveal</div>
+                </div>
+                <!-- 正面 -->
+                <div class="card-face card-front">
+                    <!-- 圖片區 -->
+                    <div class="img-container">
+                        <!-- 預設先放一張 placeholder，之後會被 JS 替換 -->
+                        <img src="https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" id="card-img" class="card-img" alt="Illustration">
+                    </div>
+                    <div class="quote-text" id="quote-display"></div>
+                    <div class="quote-num" id="quote-number">NO.001</div>
+                </div>
+            </div>
+            <div class="particles" id="particles"></div>
+        </div>
+
+        <button class="btn-refresh" id="refresh-btn" onclick="resetCard()">Draw Another</button>
+    </div>
+
+    <div class="music-hint" id="music-hint">♪ Music On</div>
+
+    <script>
+        // 1. 語錄資料庫
+        const quotes = [
+            "你的存在本身就是一種美好，無需證明。",
+            "花開不需要別人的同意，你也是。",
+            "你不必完美才能被愛，現在的你就很珍貴。",
+            "你的敏感，是你感知世界溫柔的天賦。",
+            "別為了讓別人舒服，而讓自己委屈。",
+            "你值得一段不需要你小心翼翼的關係。",
+            "允許自己做個普通人，享受微小的快樂。",
+            "你的光芒，不需要藉由熄滅別人來展現。",
+            "相信你的直覺，它是靈魂在指路。",
+            "你是自己的避風港，隨時可以回家。",
+            "眼淚是靈魂在洗澡，洗乾淨了光才透得進來。",
+            "受傷的地方，會長出更堅強的翅膀。",
+            "沒有一種情緒是錯誤的，它們只是想被看見。",
+            "生活或許有點苦，但你可以是那顆糖。",
+            "把期待降低，把依賴變少，你會發現力量。",
+            "去愛那個在鏡子裡看著你的人。",
+            "溫柔地對待世界，更要溫柔地對待自己。",
+            "今天的任務：喝杯溫水，好好睡覺。",
+            "日落是為了提醒我們，結束也可以很美。",
+            "愛自己，是終身浪漫的開始。"
+        ];
+
+        /* 
+           2. 圖片資料庫 (請在此放入你的圖片檔名)
+           使用教學：
+           1. 在 GitHub 上傳圖片到一個叫 images 的資料夾 (或直接放在根目錄)。
+           2. 把檔名填入下方。
+        */
+        const images = [
+            // 這裡我先放幾張網路上的範例圖，讓你測試效果
+            // 等你自己上傳後，改成 "images/1.jpg", "images/2.jpg" 這樣即可
+            "https://images.unsplash.com/photo-1490750967868-58cb75069faf?auto=format&fit=crop&w=500&q=60",
+            "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=500&q=60",
+            "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=500&q=60",
+            "https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?auto=format&fit=crop&w=500&q=60",
+            "https://images.unsplash.com/photo-1436891620547-f1e149167b47?auto=format&fit=crop&w=500&q=60"
+        ];
+
+        const card = document.getElementById('card');
+        const quoteDisplay = document.getElementById('quote-display');
+        const quoteNum = document.getElementById('quote-number');
+        const refreshBtn = document.getElementById('refresh-btn');
+        const cardImg = document.getElementById('card-img');
+        const particlesContainer = document.getElementById('particles');
+        const bgm = document.getElementById('bgm');
+        const musicHint = document.getElementById('music-hint');
+        
+        let isFlipped = false;
+        let musicStarted = false;
+
+        function flipCard() {
+            if (!musicStarted) {
+                bgm.volume = 0.5;
+                bgm.play().then(() => {
+                    musicStarted = true;
+                    musicHint.style.opacity = 1;
+                    setTimeout(() => musicHint.style.opacity = 0, 3000);
+                }).catch(e => console.log("Waiting for interaction"));
+            }
+
+            if (isFlipped) return; 
+
+            // 1. 隨機選語錄
+            const qIndex = Math.floor(Math.random() * quotes.length);
+            quoteDisplay.textContent = quotes[qIndex];
+            quoteNum.textContent = `NO.${(qIndex + 1).toString().padStart(3, '0')}`;
+
+            // 2. 隨機選圖片
+            const imgIndex = Math.floor(Math.random() * images.length);
+            cardImg.src = images[imgIndex];
+
+            // 3. 翻牌
+            card.classList.add('is-flipped');
+            isFlipped = true;
+            createParticles();
+
+            // 4. 動畫延遲
+            setTimeout(() => {
+                cardImg.style.animation = 'contentFadeIn 1s ease forwards';
+                quoteDisplay.style.animation = 'contentFadeIn 1s ease forwards 0.2s';
+                quoteNum.style.animation = 'contentFadeIn 1s ease forwards 0.4s';
+            }, 300);
+
+            setTimeout(() => {
+                refreshBtn.classList.add('show');
+            }, 1000);
+        }
+
+        function createParticles() {
+            for (let i = 0; i < 30; i++) {
+                const p = document.createElement('div');
+                p.classList.add('particle');
+                particlesContainer.appendChild(p);
+
+                const angle = Math.random() * Math.PI * 2;
+                const velocity = 50 + Math.random() * 100;
+                const tx = Math.cos(angle) * velocity;
+                const ty = Math.sin(angle) * velocity;
+
+                p.animate([
+                    { transform: 'translate(-50%, -50%) scale(0)', opacity: 1 },
+                    { transform: `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(1)`, opacity: 0 }
+                ], {
+                    duration: 800 + Math.random() * 400,
+                    easing: 'cubic-bezier(0, .9, .57, 1)',
+                }).onfinish = () => p.remove();
+            }
+        }
+
+        function resetCard() {
+            card.classList.remove('is-flipped');
+            isFlipped = false;
+            refreshBtn.classList.remove('show');
+            
+            cardImg.style.opacity = 0;
+            cardImg.style.animation = 'none';
+            quoteDisplay.style.opacity = 0;
+            quoteDisplay.style.animation = 'none';
+            quoteNum.style.opacity = 0;
+            quoteNum.style.animation = 'none';
+        }
+    </script>
+</body>
+</html>
