@@ -189,39 +189,47 @@
             padding: 8px 15px;
         }
 
-        /* 卡面 (放入圖片的位置) */
+        /* 卡面 */
         .card-front {
             transform: rotateY(180deg);
             padding: 20px;
             flex-direction: column;
             justify-content: flex-start; 
-            /* 卡面本身有淡淡的漸層，透明圖片會透出這個顏色 */
             background-image: linear-gradient(to bottom, #fffbf5 0%, #fff0f5 100%);
         }
 
-        /* === 修正重點：圖片容器 === */
+        /* 圖片容器 (透明PNG優化版) */
         .img-container {
             width: 100%;
-            height: 180px; 
-            margin-bottom: 15px;
-            margin-top: 10px;
-            border-radius: 0; /* 移除圓角 */
-            overflow: visible; /* 允許陰影溢出 */
-            background-color: transparent; /* 設為透明！ */
+            height: 160px; /* 稍微縮小一點點，留空間給星星 */
+            margin-bottom: 5px;
+            margin-top: 5px;
+            border-radius: 0;
+            overflow: visible;
+            background-color: transparent;
             display: flex;
             justify-content: center;
             align-items: center;
-            box-shadow: none; /* 移除方框陰影 */
+            box-shadow: none;
         }
 
         .card-img {
             width: 100%;
             height: 100%;
-            object-fit: contain; /* 改為 contain：確保圖片不被裁切 */
+            object-fit: contain;
             display: block;
             opacity: 0; 
-            /* 如果圖片本身是黑色的，這個陰影會讓它有點浮起來的感覺 */
             filter: drop-shadow(0 5px 8px rgba(0,0,0,0.1));
+        }
+
+        /* === 🌟 Star Decor (這次加回來的重點) === */
+        .star-decor {
+            color: var(--gold);
+            font-size: 1.5rem;
+            margin: 10px 0;
+            opacity: 0;
+            text-shadow: 0 0 5px rgba(212, 175, 55, 0.4);
+            animation-fill-mode: forwards;
         }
 
         .quote-text {
@@ -344,12 +352,15 @@
                 </div>
                 <!-- 正面 -->
                 <div class="card-face card-front">
-                    <!-- 圖片區 -->
+                    <!-- 1. 圖片 -->
                     <div class="img-container">
-                        <!-- 請記得確認這裡的 id 必須是 card-img -->
                         <img src="" id="card-img" class="card-img" alt="Illustration">
                     </div>
+                    <!-- 2. 星星裝飾 (Star Decor) -->
+                    <div class="star-decor" id="decor">✦</div>
+                    <!-- 3. 文字 -->
                     <div class="quote-text" id="quote-display"></div>
+                    <!-- 4. 編號 -->
                     <div class="quote-num" id="quote-number">NO.001</div>
                 </div>
             </div>
@@ -394,24 +405,7 @@
             // 範例：請改成妳實際的檔名，例如 "images/heart.png"
             "images/1.png",
             "images/2.png",
-            "images/3.png",
-            "images/4.png",
-            "images/5.png",
-            "images/6.png",
-            "images/7.png",
-            "images/8.png",
-            "images/9.png",
-            "images/10.png",
-            "images/11.png",
-            "images/12.png",
-            "images/13.png",
-            "images/14.png",
-            "images/15.png",
-            "images/16.png",
-            "images/17.png",
-            "images/18.png",
-            "images/19.png",
-            "images/20.png"
+            "images/3.png"
         ];
 
         const card = document.getElementById('card');
@@ -419,6 +413,7 @@
         const quoteNum = document.getElementById('quote-number');
         const refreshBtn = document.getElementById('refresh-btn');
         const cardImg = document.getElementById('card-img');
+        const decor = document.getElementById('decor'); // 取得星星元素
         const particlesContainer = document.getElementById('particles');
         const bgm = document.getElementById('bgm');
         const musicHint = document.getElementById('music-hint');
@@ -444,13 +439,12 @@
             quoteNum.textContent = `NO.${(qIndex + 1).toString().padStart(3, '0')}`;
 
             // 2. 隨機選圖片
-            // 如果 images 陣列是空的，或者發生錯誤，這裡加了一個保護機制
             if (images.length > 0) {
                 const imgIndex = Math.floor(Math.random() * images.length);
                 cardImg.src = images[imgIndex];
                 cardImg.style.display = 'block';
             } else {
-                cardImg.style.display = 'none'; // 沒圖片就隱藏
+                cardImg.style.display = 'none';
             }
 
             // 3. 翻牌
@@ -458,16 +452,17 @@
             isFlipped = true;
             createParticles();
 
-            // 4. 動畫延遲
+            // 4. 動畫順序 (圖片 -> 星星 -> 文字 -> 編號)
             setTimeout(() => {
                 cardImg.style.animation = 'contentFadeIn 1s ease forwards';
-                quoteDisplay.style.animation = 'contentFadeIn 1s ease forwards 0.2s';
-                quoteNum.style.animation = 'contentFadeIn 1s ease forwards 0.4s';
+                decor.style.animation = 'contentFadeIn 1s ease forwards 0.2s'; // 星星出現
+                quoteDisplay.style.animation = 'contentFadeIn 1s ease forwards 0.4s';
+                quoteNum.style.animation = 'contentFadeIn 1s ease forwards 0.6s';
             }, 300);
 
             setTimeout(() => {
                 refreshBtn.classList.add('show');
-            }, 1000);
+            }, 1200);
         }
 
         function createParticles() {
@@ -498,6 +493,8 @@
             
             cardImg.style.opacity = 0;
             cardImg.style.animation = 'none';
+            decor.style.opacity = 0;
+            decor.style.animation = 'none';
             quoteDisplay.style.opacity = 0;
             quoteDisplay.style.animation = 'none';
             quoteNum.style.opacity = 0;
