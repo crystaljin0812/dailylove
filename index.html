@@ -189,59 +189,66 @@
             padding: 8px 15px;
         }
 
-        /* 卡面 */
+        /* 卡面佈局調整 */
         .card-front {
             transform: rotateY(180deg);
-            padding: 20px;
+            padding: 25px 20px; /* 上下 padding 調整 */
             flex-direction: column;
-            justify-content: flex-start; 
+            justify-content: flex-start; /* 內容靠上 */
             background-image: linear-gradient(to bottom, #fffbf5 0%, #fff0f5 100%);
         }
 
-        /* 圖片容器 (透明PNG優化版) */
+        /* 
+           圖片容器 (加大版) 
+           從原本的 160px 加大到 250px
+        */
         .img-container {
             width: 100%;
-            height: 160px; /* 稍微縮小一點點，留空間給星星 */
+            height: 250px; /* 這裡變大了！ */
             margin-bottom: 5px;
-            margin-top: 5px;
+            margin-top: 0;
             border-radius: 0;
             overflow: visible;
             background-color: transparent;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-end; /* 讓圖片底部對齊星星 */
             box-shadow: none;
         }
 
         .card-img {
             width: 100%;
             height: 100%;
-            object-fit: contain;
+            object-fit: contain; /* 保持比例 */
             display: block;
             opacity: 0; 
             filter: drop-shadow(0 5px 8px rgba(0,0,0,0.1));
         }
 
-        /* === 🌟 Star Decor (這次加回來的重點) === */
+        /* Star Decor (間距緊縮版) */
         .star-decor {
             color: var(--gold);
             font-size: 1.5rem;
-            margin: 10px 0;
+            margin-top: 10px;    /* 距離圖片一點點 */
+            margin-bottom: 5px;  /* 距離文字非常近！ */
             opacity: 0;
             text-shadow: 0 0 5px rgba(212, 175, 55, 0.4);
-            animation-fill-mode: forwards;
+            line-height: 1;      /* 減少行高造成的間距 */
         }
 
+        /* 文字區域 */
         .quote-text {
-            font-size: 1.1rem;
-            line-height: 1.6;
+            font-size: 1.15rem;
+            line-height: 1.5;
             color: #2c2c2c;
             text-align: center;
             font-weight: 600;
             opacity: 0;
             transform: translateY(10px);
-            margin-bottom: auto; 
-            margin-top: auto;
+            
+            /* 移除 auto margin，讓它不要飄走 */
+            margin-top: 0; 
+            margin-bottom: 20px; /* 距離下方編號一點空間 */
             padding: 0 5px;
         }
 
@@ -402,7 +409,6 @@
            請在這裡填入妳上傳到 GitHub 的透明 PNG 檔名
         */
         const images = [
-            // 範例：請改成妳實際的檔名，例如 "images/heart.png"
             "images/1.png",
             "images/2.png",
             "images/3.png",
@@ -423,6 +429,7 @@
             "images/18.png",
             "images/19.png",
             "images/20.png"
+            // 記得把你實際的檔名換上來
         ];
 
         const card = document.getElementById('card');
@@ -430,7 +437,7 @@
         const quoteNum = document.getElementById('quote-number');
         const refreshBtn = document.getElementById('refresh-btn');
         const cardImg = document.getElementById('card-img');
-        const decor = document.getElementById('decor'); // 取得星星元素
+        const decor = document.getElementById('decor'); 
         const particlesContainer = document.getElementById('particles');
         const bgm = document.getElementById('bgm');
         const musicHint = document.getElementById('music-hint');
@@ -472,7 +479,7 @@
             // 4. 動畫順序 (圖片 -> 星星 -> 文字 -> 編號)
             setTimeout(() => {
                 cardImg.style.animation = 'contentFadeIn 1s ease forwards';
-                decor.style.animation = 'contentFadeIn 1s ease forwards 0.2s'; // 星星出現
+                decor.style.animation = 'contentFadeIn 1s ease forwards 0.2s'; 
                 quoteDisplay.style.animation = 'contentFadeIn 1s ease forwards 0.4s';
                 quoteNum.style.animation = 'contentFadeIn 1s ease forwards 0.6s';
             }, 300);
